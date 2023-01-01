@@ -19,21 +19,21 @@ func main() {
 
 	zap.ReplaceGlobals(logger)
 
-	serverConfig, err := utils.GetServerConfig()
+	config, err := utils.GetConfig()
 	if err != nil {
 		logger.Error(fmt.Sprintf("Failed to get server configuration, err: %s", err.Error()))
 		os.Exit(1)
 	}
 
-	database := database.NewDatabaseFactory().NewDatabase(serverConfig.DatabaseUri, serverConfig.DatabaseName, serverConfig.DatabaseCollection)
+	database := database.NewDatabaseFactory().NewDatabase(config.DatabaseUri, config.DatabaseName, config.DatabaseCollection)
 
-	err = database.Start()
+	err = database.Connect()
 	if err != nil {
 		logger.Error(fmt.Sprintf("Failed to connect to the database, err: %s", err.Error()))
 		os.Exit(1)
 	}
 
-	server := server.NewServerFactory().NewServer(serverConfig.ServerPort, database)
+	server := server.NewServerFactory().NewServer(config.ServerPort, database)
 
 	server.Start()
 

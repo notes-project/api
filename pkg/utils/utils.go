@@ -17,7 +17,7 @@ const (
 	envVarIsEmptyErrMsg = "env var %s is empty"
 )
 
-type ServerConfig struct {
+type Config struct {
 	DatabaseUri        string
 	DatabaseName       string
 	DatabaseCollection string
@@ -25,28 +25,28 @@ type ServerConfig struct {
 	ServerPort string
 }
 
-func GetServerConfig() (ServerConfig, error) {
+func GetConfig() (Config, error) {
 	dbUri, exist := os.LookupEnv(DATABASE_URI)
 	if !exist {
-		return ServerConfig{}, fmt.Errorf(envVarIsEmptyErrMsg, DATABASE_URI)
+		return Config{}, fmt.Errorf(envVarIsEmptyErrMsg, DATABASE_URI)
 	}
 
 	dbName, exist := os.LookupEnv(DATABASE_NAME)
 	if !exist {
-		return ServerConfig{}, fmt.Errorf(envVarIsEmptyErrMsg, DATABASE_NAME)
+		return Config{}, fmt.Errorf(envVarIsEmptyErrMsg, DATABASE_NAME)
 	}
 
 	dbCollection, exist := os.LookupEnv(DATABASE_COLLECTION)
 	if !exist {
-		return ServerConfig{}, fmt.Errorf(envVarIsEmptyErrMsg, DATABASE_COLLECTION)
+		return Config{}, fmt.Errorf(envVarIsEmptyErrMsg, DATABASE_COLLECTION)
 	}
 
 	serverPort, exist := os.LookupEnv(SERVER_PORT)
 	if !exist {
-		return ServerConfig{}, fmt.Errorf(envVarIsEmptyErrMsg, serverPort)
+		return Config{}, fmt.Errorf(envVarIsEmptyErrMsg, serverPort)
 	}
 
-	return ServerConfig{
+	return Config{
 		DatabaseUri:        dbUri,
 		DatabaseName:       dbName,
 		DatabaseCollection: dbCollection,
