@@ -19,7 +19,7 @@ type Database interface {
 
 	AddNote(note model.Note) error
 	UpdateNote() error
-	GetNote() error
+	GetNote(noteTitle string) (model.Note, error)
 	GetNotes() ([]model.Note, error)
 	DeleteNote() error
 }
@@ -34,6 +34,10 @@ type database struct {
 
 	logger *zap.Logger
 }
+
+const (
+	noteTitleKey = "title"
+)
 
 var (
 	ctx = context.TODO()
@@ -73,8 +77,6 @@ func (d *database) Start() error {
 }
 
 func (d *database) setUniqueIndexes() error {
-	noteTitleKey := "title"
-
 	_, err := d.mongoCollection.Indexes().CreateOne(ctx, mongo.IndexModel{
 		// the title filed of the note from model.Note
 		Keys: bson.D{
@@ -109,9 +111,29 @@ func (d *database) AddNote(note model.Note) error {
 }
 
 func (d *database) UpdateNote() error { return nil }
-func (d *database) GetNote() error    { return nil }
+
+func (d *database) GetNote(noteTitle string) (model.Note, error) {
+
+	result := d.mongoCollection.FindOne(ctx, bson.D{
+		{
+			Key:   noteTitleKey,
+			Value: noteTitle,
+		},
+	},
+	)
+
+	note := model.Note{}
+
+	err := result.Decode(&note)
+	if err != nil {
+		return model.Note{}, fmt.Errorf("failed to decode note into object, err: %w", err)
+	}
+
+	return note, nil
+}
 
 func (d *database) GetNotes() ([]model.Note, error) {
+
 	cursor, err := d.mongoCollection.Find(ctx, bson.D{})
 	if err != nil {
 		return []model.Note{}, fmt.Errorf("failed to get notes from collection, err: %w", err)

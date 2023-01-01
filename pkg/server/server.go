@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -38,7 +39,9 @@ func (s server) Start() {
 	v1 := s.ginRouter.Group("/api/v1")
 	{
 		v1.POST("/notes", s.addNote)
+
 		v1.GET("/notes", s.getNotes)
+		v1.GET("/notes/:title", s.getNoteByTitle)
 	}
 
 	s.logger.Info(fmt.Sprintf("Server started on port %s", s.port))
@@ -60,7 +63,10 @@ func (s server) addNote(c *gin.Context) {
 
 	err = s.db.AddNote(note)
 	if err != nil {
+
 		if mongo.IsDuplicateKeyError(err) {
+			s.logger.Info(fmt.Sprintf("Note with title '%s' already exists in database", note.Title))
+
 			c.JSON(http.StatusBadRequest,
 				gin.H{
 					"error": fmt.Sprintf("note with key 'title' and value '%s' already exists", note.Title),
@@ -72,9 +78,11 @@ func (s server) addNote(c *gin.Context) {
 
 		s.logger.Error(fmt.Sprintf("Failed to add a note to the database, err: %s", err))
 
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError,
+			gin.H{
+				"error": err.Error(),
+			},
+		)
 
 		return
 	}
@@ -82,21 +90,63 @@ func (s server) addNote(c *gin.Context) {
 }
 
 func (s server) getNotes(c *gin.Context) {
+
 	notes, err := s.db.GetNotes()
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("Failed to get notes from database, err: %s", err))
 
 		c.JSON(http.StatusInternalServerError,
 			gin.H{
-				"error": "failed to retrieve notes from database",
+				"error": "failed to retrieve notes",
 			},
 		)
 
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"notes": notes,
-	})
+	c.JSON(http.StatusOK,
+		gin.H{
+			"notes": notes,
+		},
+	)
+
+}
+
+func (s server) getNoteByTitle(c *gin.Context) {
+
+	noteTtile := c.Param("title")
+
+	note, err := s.db.GetNote(noteTtile)
+	if err != nil {
+
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			s.logger.Info(fmt.Sprintf("Note with title '%s' does not exist in database", noteTtile))
+
+			c.JSON(http.StatusBadRequest,
+				gin.H{
+					"error": fmt.Sprintf("note with title '%s' does not exist", noteTtile),
+				},
+			)
+
+			return
+
+		}
+
+		s.logger.Error(fmt.Sprintf("Failed to get note with title '%s' from database, err: %s", noteTtile, err))
+
+		c.JSON(http.StatusInternalServerError,
+			gin.H{
+				"error": fmt.Sprintf("failed to retrieve note with title '%s'", noteTtile),
+			},
+		)
+
+		return
+	}
+
+	c.JSON(http.StatusOK,
+		gin.H{
+			"note": note,
+		},
+	)
 
 }
