@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/denislavPetkov/notes/constants"
-	"github.com/denislavPetkov/notes/database"
-	"github.com/denislavPetkov/notes/model"
+	"github.com/denislavPetkov/notes/pkg/constants"
+	"github.com/denislavPetkov/notes/pkg/database"
+	"github.com/denislavPetkov/notes/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"go.mongodb.org/mongo-driver/mongo"

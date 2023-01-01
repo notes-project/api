@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/denislavPetkov/notes/database"
-	"github.com/denislavPetkov/notes/server"
-	"github.com/denislavPetkov/notes/utils"
+	"github.com/denislavPetkov/notes/pkg/database"
+	"github.com/denislavPetkov/notes/pkg/server"
+	"github.com/denislavPetkov/notes/pkg/utils"
 	"go.uber.org/zap"
 )
 

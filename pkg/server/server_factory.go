@@ -3,7 +3,7 @@ package server
 import (
 	"sync"
 
-	"github.com/denislavPetkov/notes/database"
+	"github.com/denislavPetkov/notes/pkg/database"
 	"go.uber.org/zap"
 )
 
