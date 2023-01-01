@@ -1,7 +1,5 @@
 package constants
 
-import "time"
-
 const (
-	DateFormat = time.RFC822
+	DateFormat = "02-Jan-2006"
 )
