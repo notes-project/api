@@ -21,6 +21,7 @@ type Database interface {
 	UpdateNote(noteTitle string, updatedNote model.Note) error
 	GetNote(noteTitle string) (model.Note, error)
 	GetNotes() ([]model.Note, error)
+	GetNotesFiltered(tags []string, category, date string) ([]model.Note, error)
 	DeleteNote(noteTitle string) error
 }
 

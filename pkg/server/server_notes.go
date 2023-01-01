@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/denislavPetkov/notes/pkg/constants"
@@ -51,7 +52,15 @@ func (s server) addNote(c *gin.Context) {
 }
 
 func (s server) getNotes(c *gin.Context) {
-	notes, err := s.db.GetNotes()
+	var notes []model.Note
+	var err error
+
+	tags := strings.Split(c.Query("tags"), ",")
+	category := c.Query("category")
+	date := c.Query("date")
+
+	notes, err = s.db.GetNotesFiltered(tags, category, date)
+
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("Failed to get notes from database, err: %s", err))
 

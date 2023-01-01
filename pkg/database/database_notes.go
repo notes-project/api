@@ -75,6 +75,68 @@ func (d *database) GetNotes() ([]model.Note, error) {
 	return notes, nil
 }
 
+func (d *database) GetNotesFiltered(tags []string, category, date string) ([]model.Note, error) {
+
+	tagsFilter := getTagsFilter(tags)
+	categoryFilter := getCategoryFilter(category)
+	dateFilter := getDateFilter(date)
+
+	cursor, err := d.collection.Find(ctx, bson.D{
+		tagsFilter,
+		categoryFilter,
+		dateFilter,
+	})
+	if err != nil {
+		return []model.Note{}, fmt.Errorf("failed to get notes from collection, error: %w", err)
+	}
+
+	var notes []model.Note
+	err = cursor.All(ctx, &notes)
+	if err != nil {
+		return []model.Note{}, fmt.Errorf("failed to get notes from collection, error: %w", err)
+	}
+
+	return notes, nil
+}
+
+func getTagsFilter(tags []string) bson.E {
+	if len(tags) == 1 && tags[0] == "" {
+		return bson.E{}
+	}
+
+	return bson.E{
+		Key: "tags",
+		Value: bson.D{
+			{
+				Key:   "$all",
+				Value: tags,
+			},
+		},
+	}
+}
+
+func getDateFilter(date string) bson.E {
+	if date == "" {
+		return bson.E{}
+	}
+
+	return bson.E{
+		Key:   "date",
+		Value: date,
+	}
+}
+
+func getCategoryFilter(category string) bson.E {
+	if category == "" {
+		return bson.E{}
+	}
+
+	return bson.E{
+		Key:   "category",
+		Value: category,
+	}
+}
+
 func (d *database) DeleteNote(noteTitle string) error {
 	result, err := d.collection.DeleteOne(ctx,
 		bson.D{
