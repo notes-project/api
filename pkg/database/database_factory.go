@@ -26,10 +26,10 @@ func (df databaseFactory) NewDatabase(connectionUri, dbName, dbCollection string
 
 	once.Do(func() {
 		databaseInstance = &database{
-			connectionUri: connectionUri,
-			databaseName:  dbName,
-			collection:    dbCollection,
-			logger:        zap.L().Named("Database"),
+			connectionUri:  connectionUri,
+			databaseName:   dbName,
+			collectionName: dbCollection,
+			logger:         zap.L().Named("Database"),
 		}
 	})
 

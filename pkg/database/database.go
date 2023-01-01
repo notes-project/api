@@ -21,16 +21,16 @@ type Database interface {
 	UpdateNote() error
 	GetNote(noteTitle string) (model.Note, error)
 	GetNotes() ([]model.Note, error)
-	DeleteNote() error
+	DeleteNote(noteTitle string) error
 }
 
 type database struct {
-	connectionUri string
-	databaseName  string
-	collection    string
+	connectionUri  string
+	databaseName   string
+	collectionName string
 
-	mongoClient     *mongo.Client
-	mongoCollection *mongo.Collection
+	client     *mongo.Client
+	collection *mongo.Collection
 
 	logger *zap.Logger
 }
@@ -45,7 +45,7 @@ var (
 
 func (d *database) Start() error {
 
-	if d.mongoClient != nil {
+	if d.client != nil {
 		d.logger.Info("Database already started")
 		return nil
 	}
@@ -54,17 +54,17 @@ func (d *database) Start() error {
 	// set auth?
 	clientOptions := options.Client().ApplyURI(d.connectionUri)
 
-	d.mongoClient, err = mongo.Connect(ctx, clientOptions)
+	d.client, err = mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		return fmt.Errorf("failed to connect to the database, err: %w", err)
+		return fmt.Errorf("failed to connect to the database, error: %w", err)
 	}
 
-	err = d.mongoClient.Ping(context.TODO(), readpref.Primary())
+	err = d.client.Ping(context.TODO(), readpref.Primary())
 	if err != nil {
-		return fmt.Errorf("failed to verify database connection, err: %w", err)
+		return fmt.Errorf("failed to verify database connection, error: %w", err)
 	}
 
-	d.mongoCollection = d.mongoClient.Database(d.databaseName).Collection(d.collection)
+	d.collection = d.client.Database(d.databaseName).Collection(d.collectionName)
 
 	err = d.setUniqueIndexes()
 	if err != nil {
@@ -77,7 +77,7 @@ func (d *database) Start() error {
 }
 
 func (d *database) setUniqueIndexes() error {
-	_, err := d.mongoCollection.Indexes().CreateOne(ctx, mongo.IndexModel{
+	_, err := d.collection.Indexes().CreateOne(ctx, mongo.IndexModel{
 		// the title filed of the note from model.Note
 		Keys: bson.D{
 			{Key: noteTitleKey, Value: -1},
@@ -85,7 +85,7 @@ func (d *database) setUniqueIndexes() error {
 		Options: options.Index().SetUnique(true),
 	})
 	if err != nil {
-		return fmt.Errorf("failed to set '%s' as a unique collection index, err: %w", noteTitleKey, err)
+		return fmt.Errorf("failed to set '%s' as a unique collection index, error: %w", noteTitleKey, err)
 	}
 
 	d.logger.Info(fmt.Sprintf("Successfully set '%s' as a unique collection index", noteTitleKey))
@@ -94,15 +94,15 @@ func (d *database) setUniqueIndexes() error {
 }
 
 func (d *database) IsReady() bool {
-	err := d.mongoClient.Ping(context.TODO(), readpref.Primary())
+	err := d.client.Ping(context.TODO(), readpref.Primary())
 	return err == nil
 }
 
 func (d *database) AddNote(note model.Note) error {
-	_, err := d.mongoCollection.InsertOne(ctx, note)
+	_, err := d.collection.InsertOne(ctx, note)
 
 	if err != nil {
-		return fmt.Errorf("failed to add note %v to the collection, err: %w", note, err)
+		return fmt.Errorf("failed to add note %v to the collection, error: %w", note, err)
 	}
 
 	d.logger.Info("Successfully added note to the collection", zap.Any("note", note))
@@ -114,7 +114,7 @@ func (d *database) UpdateNote() error { return nil }
 
 func (d *database) GetNote(noteTitle string) (model.Note, error) {
 
-	result := d.mongoCollection.FindOne(ctx, bson.D{
+	result := d.collection.FindOne(ctx, bson.D{
 		{
 			Key:   noteTitleKey,
 			Value: noteTitle,
@@ -126,7 +126,7 @@ func (d *database) GetNote(noteTitle string) (model.Note, error) {
 
 	err := result.Decode(&note)
 	if err != nil {
-		return model.Note{}, fmt.Errorf("failed to decode note into object, err: %w", err)
+		return model.Note{}, fmt.Errorf("failed to decode note into object, error: %w", err)
 	}
 
 	return note, nil
@@ -134,18 +134,34 @@ func (d *database) GetNote(noteTitle string) (model.Note, error) {
 
 func (d *database) GetNotes() ([]model.Note, error) {
 
-	cursor, err := d.mongoCollection.Find(ctx, bson.D{})
+	cursor, err := d.collection.Find(ctx, bson.D{})
 	if err != nil {
-		return []model.Note{}, fmt.Errorf("failed to get notes from collection, err: %w", err)
+		return []model.Note{}, fmt.Errorf("failed to get notes from collection, error: %w", err)
 	}
 
 	var notes []model.Note
 	err = cursor.All(ctx, &notes)
 	if err != nil {
-		return []model.Note{}, fmt.Errorf("failed to get notes from collection, err: %w", err)
+		return []model.Note{}, fmt.Errorf("failed to get notes from collection, error: %w", err)
 	}
 
 	return notes, nil
 }
 
-func (d *database) DeleteNote() error { return nil }
+func (d *database) DeleteNote(noteTitle string) error {
+
+	_, err := d.collection.DeleteOne(ctx,
+		bson.D{
+			{
+				Key:   noteTitleKey,
+				Value: noteTitle,
+			},
+		},
+	)
+
+	if err != nil {
+		return fmt.Errorf("failed to delete note '%s' from collection, error: %w", noteTitle, err)
+	}
+
+	return nil
+}

@@ -27,7 +27,6 @@ type server struct {
 }
 
 func (s server) Start() {
-
 	s.ginRouter = gin.Default()
 
 	base := s.ginRouter.Group("/api")
@@ -42,6 +41,8 @@ func (s server) Start() {
 
 		v1.GET("/notes", s.getNotes)
 		v1.GET("/notes/:title", s.getNoteByTitle)
+
+		v1.DELETE("/notes/:title", s.deleteNoteByTitle)
 	}
 
 	s.logger.Info(fmt.Sprintf("Server started on port %s", s.port))
@@ -50,7 +51,6 @@ func (s server) Start() {
 }
 
 func (s server) addNote(c *gin.Context) {
-
 	note := model.Note{}
 
 	err := c.MustBindWith(&note, binding.JSON)
@@ -63,9 +63,8 @@ func (s server) addNote(c *gin.Context) {
 
 	err = s.db.AddNote(note)
 	if err != nil {
-
 		if mongo.IsDuplicateKeyError(err) {
-			s.logger.Info(fmt.Sprintf("Note with title '%s' already exists in database", note.Title))
+			s.logger.Info(fmt.Sprintf("Note '%s' already exists in database", note.Title))
 
 			c.JSON(http.StatusBadRequest,
 				gin.H{
@@ -86,11 +85,9 @@ func (s server) addNote(c *gin.Context) {
 
 		return
 	}
-
 }
 
 func (s server) getNotes(c *gin.Context) {
-
 	notes, err := s.db.GetNotes()
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("Failed to get notes from database, err: %s", err))
@@ -107,36 +104,32 @@ func (s server) getNotes(c *gin.Context) {
 	c.JSON(http.StatusOK,
 		gin.H{
 			"notes": notes,
-		},
-	)
-
+		})
 }
 
 func (s server) getNoteByTitle(c *gin.Context) {
-
 	noteTtile := c.Param("title")
 
 	note, err := s.db.GetNote(noteTtile)
 	if err != nil {
 
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			s.logger.Info(fmt.Sprintf("Note with title '%s' does not exist in database", noteTtile))
+			s.logger.Info(fmt.Sprintf("Note '%s' does not exist in database", noteTtile))
 
 			c.JSON(http.StatusBadRequest,
 				gin.H{
-					"error": fmt.Sprintf("note with title '%s' does not exist", noteTtile),
+					"error": fmt.Sprintf("note '%s' does not exist", noteTtile),
 				},
 			)
 
 			return
-
 		}
 
-		s.logger.Error(fmt.Sprintf("Failed to get note with title '%s' from database, err: %s", noteTtile, err))
+		s.logger.Error(fmt.Sprintf("Failed to get note '%s' from database, err: %s", noteTtile, err))
 
 		c.JSON(http.StatusInternalServerError,
 			gin.H{
-				"error": fmt.Sprintf("failed to retrieve note with title '%s'", noteTtile),
+				"error": fmt.Sprintf("failed to retrieve note '%s'", noteTtile),
 			},
 		)
 
@@ -146,7 +139,24 @@ func (s server) getNoteByTitle(c *gin.Context) {
 	c.JSON(http.StatusOK,
 		gin.H{
 			"note": note,
-		},
-	)
+		})
+}
 
+func (s server) deleteNoteByTitle(c *gin.Context) {
+	noteTtile := c.Param("title")
+
+	err := s.db.DeleteNote(noteTtile)
+	if err != nil {
+		s.logger.Error(fmt.Sprintf("Failed to delete note '%s' from database, err: %s", noteTtile, err))
+
+		c.JSON(http.StatusInternalServerError,
+			gin.H{
+				"error": fmt.Sprintf("failed to retrieve note '%s'", noteTtile),
+			},
+		)
+
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
