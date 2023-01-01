@@ -18,7 +18,7 @@ type Database interface {
 	IsReady() bool
 
 	AddNote(note model.Note) error
-	UpdateNote() error
+	UpdateNote(noteTitle string, updatedNote model.Note) error
 	GetNote(noteTitle string) (model.Note, error)
 	GetNotes() ([]model.Note, error)
 	DeleteNote(noteTitle string) error
@@ -110,10 +110,27 @@ func (d *database) AddNote(note model.Note) error {
 	return nil
 }
 
-func (d *database) UpdateNote() error { return nil }
+func (d *database) UpdateNote(noteTitle string, updatedNote model.Note) error {
+	result, err := d.collection.ReplaceOne(ctx, bson.D{
+		{
+			Key:   noteTitleKey,
+			Value: noteTitle,
+		},
+	},
+		updatedNote,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to update note '%s', error: %w", noteTitle, err)
+	}
+
+	if result.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
 
 func (d *database) GetNote(noteTitle string) (model.Note, error) {
-
 	result := d.collection.FindOne(ctx, bson.D{
 		{
 			Key:   noteTitleKey,
@@ -133,7 +150,6 @@ func (d *database) GetNote(noteTitle string) (model.Note, error) {
 }
 
 func (d *database) GetNotes() ([]model.Note, error) {
-
 	cursor, err := d.collection.Find(ctx, bson.D{})
 	if err != nil {
 		return []model.Note{}, fmt.Errorf("failed to get notes from collection, error: %w", err)
@@ -149,8 +165,7 @@ func (d *database) GetNotes() ([]model.Note, error) {
 }
 
 func (d *database) DeleteNote(noteTitle string) error {
-
-	_, err := d.collection.DeleteOne(ctx,
+	result, err := d.collection.DeleteOne(ctx,
 		bson.D{
 			{
 				Key:   noteTitleKey,
@@ -161,6 +176,10 @@ func (d *database) DeleteNote(noteTitle string) error {
 
 	if err != nil {
 		return fmt.Errorf("failed to delete note '%s' from collection, error: %w", noteTitle, err)
+	}
+
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
 	}
 
 	return nil

@@ -43,6 +43,8 @@ func (s server) Start() {
 		v1.GET("/notes/:title", s.getNoteByTitle)
 
 		v1.DELETE("/notes/:title", s.deleteNoteByTitle)
+
+		v1.POST("/notes/:title", s.updateNoteByTitle)
 	}
 
 	s.logger.Info(fmt.Sprintf("Server started on port %s", s.port))
@@ -116,7 +118,7 @@ func (s server) getNoteByTitle(c *gin.Context) {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			s.logger.Info(fmt.Sprintf("Note '%s' does not exist in database", noteTtile))
 
-			c.JSON(http.StatusBadRequest,
+			c.JSON(http.StatusNotFound,
 				gin.H{
 					"error": fmt.Sprintf("note '%s' does not exist", noteTtile),
 				},
@@ -147,11 +149,64 @@ func (s server) deleteNoteByTitle(c *gin.Context) {
 
 	err := s.db.DeleteNote(noteTtile)
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			s.logger.Info(fmt.Sprintf("Note '%s' does not exist in database", noteTtile))
+
+			c.JSON(http.StatusNoContent,
+				gin.H{
+					"error": fmt.Sprintf("note '%s' does not exist", noteTtile),
+				},
+			)
+
+			return
+		}
+
 		s.logger.Error(fmt.Sprintf("Failed to delete note '%s' from database, err: %s", noteTtile, err))
 
 		c.JSON(http.StatusInternalServerError,
 			gin.H{
 				"error": fmt.Sprintf("failed to retrieve note '%s'", noteTtile),
+			},
+		)
+
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func (s server) updateNoteByTitle(c *gin.Context) {
+	noteTtile := c.Param("title")
+
+	note := model.Note{}
+
+	err := c.MustBindWith(&note, binding.JSON)
+	if err != nil {
+		s.logger.Error(err.Error())
+		return
+	}
+
+	note.Date = time.Now().Format(constants.DateFormat)
+
+	err = s.db.UpdateNote(noteTtile, note)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			s.logger.Info(fmt.Sprintf("Note '%s' does not exist in database", noteTtile))
+
+			c.JSON(http.StatusNotFound,
+				gin.H{
+					"error": fmt.Sprintf("note '%s' does not exist", noteTtile),
+				},
+			)
+
+			return
+		}
+
+		s.logger.Error(fmt.Sprintf("Failed to update note '%s' from database, err: %s", noteTtile, err))
+
+		c.JSON(http.StatusInternalServerError,
+			gin.H{
+				"error": fmt.Sprintf("failed to update note '%s'", noteTtile),
 			},
 		)
 
