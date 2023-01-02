@@ -47,7 +47,7 @@ func main() {
 
 	err = server.Start()
 	if err != nil {
-		logger.Error(fmt.Sprintf("Failed to start server, err: %s", err.Error()))
+		logger.Error(fmt.Sprintf("Server crashed, err: %s", err.Error()))
 		os.Exit(1)
 	}
 

@@ -52,6 +52,7 @@ func (s server) addNote(c *gin.Context) {
 }
 
 func (s server) getNotes(c *gin.Context) {
+	time.Sleep(10 * time.Second)
 	var notes []model.Note
 	var err error
 
