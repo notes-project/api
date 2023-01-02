@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: notes
+  name: notes-db-configuration
+data: 
+  DATABASE_URI: <db uri>
+  DATABASE_NAME: <db name>
+  DATABASE_COLLECTION: <db collection>
