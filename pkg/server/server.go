@@ -23,6 +23,7 @@ type server struct {
 
 func (s server) Start() {
 	s.ginRouter = gin.Default()
+	s.ginRouter.SetTrustedProxies(nil)
 
 	base := s.ginRouter.Group("/api")
 	{
