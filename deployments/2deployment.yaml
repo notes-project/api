@@ -18,6 +18,7 @@ spec:
       - image: notes:test
         name: notes
         args:
+        # need for TLS communication
           - "--tlsCertLocation=./certs/tls.crt"
           - "--tlsKeyLocation=./certs/tls.key"
         readinessProbe:
@@ -39,20 +40,24 @@ spec:
             containerPort: 3040
           - name: http-port
             containerPort: 9000
+            # need for TLS communication
           - name: https-port
             containerPort: 9001
         env:
           - name: SERVER_PORT
             value: "9000"
+          # need for TLS communication
           - name: SERVER_TLS_PORT
             value: "9001"
         envFrom:
           - secretRef:
               name: notes-db-configuration
+        # need for TLS communication
         volumeMounts:
           - name: certs
             mountPath: "./certs"
             readOnly: true
+      # need for TLS communication
       volumes:
         - name: certs
           secret:
