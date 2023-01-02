@@ -26,10 +26,8 @@ type Database interface {
 }
 
 type database struct {
-	connectionUri  string
-	databaseName   string
-	collectionName string
-	logger         *zap.Logger
+	databaseConfiguration
+	logger *zap.Logger
 
 	// populated automatically inside the Connect() method
 	client     *mongo.Client

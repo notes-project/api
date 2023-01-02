@@ -8,6 +8,8 @@ import (
 
 // health endpoints for k8s probes
 const (
+	healthPort = "3040"
+
 	readinessEndpoint = "/readyz"
 	livenessEndpoint  = "/healthz"
 )

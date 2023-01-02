@@ -7,7 +7,7 @@ import (
 )
 
 type DatabaseFactory interface {
-	NewDatabase(connectionUri, dbName, dbCollection string) Database
+	NewDatabase(dbConfig databaseConfiguration) Database
 }
 
 type databaseFactory struct{}
@@ -22,14 +22,12 @@ var (
 	databaseInstance Database
 )
 
-func (df databaseFactory) NewDatabase(connectionUri, dbName, dbCollection string) Database {
+func (df databaseFactory) NewDatabase(dbConfig databaseConfiguration) Database {
 
 	once.Do(func() {
 		databaseInstance = &database{
-			connectionUri:  connectionUri,
-			databaseName:   dbName,
-			collectionName: dbCollection,
-			logger:         zap.L().Named("Database"),
+			databaseConfiguration: dbConfig,
+			logger:                zap.L().Named("Database"),
 		}
 	})
 

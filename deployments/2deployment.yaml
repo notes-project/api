@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: notes
+  name: notes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notes
+  template:
+    metadata:
+      labels:
+        app: notes
+    spec:
+      containers:
+      - image: notes:test
+        name: notes
+        args:
+          - "--tlsCertLocation=./certs/tls.crt"
+          - "--tlsKeyLocation=./certs/tls.key"
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: health-port
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 2
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: health-port
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5 
+        ports:
+          - name: health-port
+            containerPort: 3040
+          - name: http-port
+            containerPort: 9000
+          - name: https-port
+            containerPort: 9001
+        env:
+          - name: SERVER_PORT
+            value: "9000"
+          - name: SERVER_TLS_PORT
+            value: "9001"
+        envFrom:
+          - secretRef:
+              name: notes-db-configuration
+        volumeMounts:
+          - name: certs
+            mountPath: "./certs"
+            readOnly: true
+      volumes:
+        - name: certs
+          secret:
+            secretName: notes-tls
+            optional: false
+      restartPolicy: Always

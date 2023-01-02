@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -12,6 +13,11 @@ import (
 
 func main() {
 
+	tlsCertLocation := flag.String("tlsCertLocation", "", "Specify location of certificate when TLS is enabled")
+	tlsKeyLocation := flag.String("tlsKeyLocation", "", "Specify location of certificate key when TLS is enabled")
+
+	flag.Parse()
+
 	logger, err := zap.NewProduction()
 	if err != nil {
 		os.Exit(1)
@@ -19,13 +25,15 @@ func main() {
 
 	zap.ReplaceGlobals(logger)
 
-	config, err := utils.GetConfig()
+	envConfig, err := utils.GetEnvConfig()
 	if err != nil {
 		logger.Error(fmt.Sprintf("Failed to get server configuration, err: %s", err.Error()))
 		os.Exit(1)
 	}
 
-	database := database.NewDatabaseFactory().NewDatabase(config.DatabaseUri, config.DatabaseName, config.DatabaseCollection)
+	dbConfig := database.NewDatabaseConfiguration(envConfig.DatabaseUri, envConfig.DatabaseName, envConfig.DatabaseCollection)
+
+	database := database.NewDatabaseFactory().NewDatabase(dbConfig)
 
 	err = database.Connect()
 	if err != nil {
@@ -33,8 +41,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	server := server.NewServerFactory().NewServer(config.ServerPort, database)
+	serverConfig := server.NewServerConfiguration(envConfig.ServerPort, envConfig.ServerTlsPort, *tlsCertLocation, *tlsKeyLocation, database)
 
-	server.Start()
+	server := server.NewServerFactory().NewServer(serverConfig)
+
+	err = server.Start()
+	if err != nil {
+		logger.Error(fmt.Sprintf("Failed to start server, err: %s", err.Error()))
+		os.Exit(1)
+	}
 
 }

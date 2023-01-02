@@ -3,12 +3,11 @@ package server
 import (
 	"sync"
 
-	"github.com/denislavPetkov/notes/pkg/database"
 	"go.uber.org/zap"
 )
 
 type ServerFactory interface {
-	NewServer(port string, db database.Database) Server
+	NewServer(serverConfig serverConfiguration) Server
 }
 
 type serverFactory struct{}
@@ -23,13 +22,12 @@ var (
 	serverInstance Server
 )
 
-func (sf serverFactory) NewServer(port string, db database.Database) Server {
+func (sf serverFactory) NewServer(serverConfig serverConfiguration) Server {
 
 	once.Do(func() {
 		serverInstance = server{
-			port:   port,
-			db:     db,
-			logger: zap.L().Named("Server"),
+			serverConfiguration: serverConfig,
+			logger:              zap.L().Named("Server"),
 		}
 	})
 

@@ -10,7 +10,8 @@ const (
 	DATABASE_NAME       = "DATABASE_NAME"
 	DATABASE_COLLECTION = "DATABASE_COLLECTION"
 
-	SERVER_PORT = "SERVER_PORT"
+	SERVER_PORT     = "SERVER_PORT"
+	SERVER_TLS_PORT = "SERVER_TLS_PORT"
 )
 
 const (
@@ -22,10 +23,11 @@ type Config struct {
 	DatabaseName       string
 	DatabaseCollection string
 
-	ServerPort string
+	ServerPort    string
+	ServerTlsPort string
 }
 
-func GetConfig() (Config, error) {
+func GetEnvConfig() (Config, error) {
 	dbUri, exist := os.LookupEnv(DATABASE_URI)
 	if !exist {
 		return Config{}, fmt.Errorf(envVarIsEmptyErrMsg, DATABASE_URI)
@@ -46,10 +48,13 @@ func GetConfig() (Config, error) {
 		return Config{}, fmt.Errorf(envVarIsEmptyErrMsg, serverPort)
 	}
 
+	serverTlsPort := os.Getenv(SERVER_TLS_PORT)
+
 	return Config{
 		DatabaseUri:        dbUri,
 		DatabaseName:       dbName,
 		DatabaseCollection: dbCollection,
 		ServerPort:         serverPort,
+		ServerTlsPort:      serverTlsPort,
 	}, nil
 }
