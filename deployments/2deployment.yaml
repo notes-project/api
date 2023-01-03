@@ -52,6 +52,15 @@ spec:
         envFrom:
           - secretRef:
               name: notes-db-configuration
+        resources:
+          limits:
+            cpu: 100m
+            memory: 250Mi
+            ephemeral-storage: 100Mi
+          requests:
+            cpu: 100m
+            memory: 250Mi
+            ephemeral-storage: 100Mi
         # need for TLS communication
         volumeMounts:
           - name: certs
@@ -63,4 +72,3 @@ spec:
           secret:
             secretName: notes-tls
             optional: false
-      restartPolicy: Always
