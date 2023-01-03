@@ -51,8 +51,9 @@ func (d *database) Connect() error {
 	}
 
 	var err error
-	// set auth?
-	clientOptions := options.Client().ApplyURI(d.connectionUri)
+
+	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
+	clientOptions := options.Client().ApplyURI(d.connectionUri).SetServerAPIOptions(serverAPIOptions)
 
 	d.client, err = mongo.Connect(ctx, clientOptions)
 	if err != nil {
