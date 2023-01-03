@@ -45,7 +45,7 @@ func GetEnvConfig() (Config, error) {
 
 	serverPort, exist := os.LookupEnv(SERVER_PORT)
 	if !exist {
-		return Config{}, fmt.Errorf(envVarIsEmptyErrMsg, serverPort)
+		return Config{}, fmt.Errorf(envVarIsEmptyErrMsg, SERVER_PORT)
 	}
 
 	serverTlsPort := os.Getenv(SERVER_TLS_PORT)
