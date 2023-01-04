@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	facademongo "github.com/denislavPetkov/notes/pkg/facade/go.mongodb.org/mongo-driver/mongo"
 	"github.com/denislavPetkov/notes/pkg/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -56,7 +57,7 @@ func (d *database) Connect() error {
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().ApplyURI(d.connectionUri).SetServerAPIOptions(serverAPIOptions)
 
-	d.client, err = mongo.Connect(ctx, clientOptions)
+	d.client, err = facademongo.GetInstace().Connect(ctx, clientOptions)
 	if err != nil {
 		return fmt.Errorf("failed to connect to the database, error: %w", err)
 	}
