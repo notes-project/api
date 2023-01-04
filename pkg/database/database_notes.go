@@ -6,7 +6,6 @@ import (
 	"github.com/denislavPetkov/notes/pkg/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.uber.org/zap"
 )
 
 func (d *database) AddNote(note model.Note) error {
@@ -16,7 +15,7 @@ func (d *database) AddNote(note model.Note) error {
 		return fmt.Errorf("failed to add note %v to the collection, error: %w", note, err)
 	}
 
-	d.logger.Info("Successfully added note to the collection", zap.Any("note", note))
+	d.logger.Info(fmt.Sprintf("Successfully added note '%s' to the collection", note.Title))
 
 	return nil
 }
@@ -67,6 +66,7 @@ func (d *database) GetNotes() ([]model.Note, error) {
 	}
 
 	var notes []model.Note
+	// not goroutine safe
 	err = cursor.All(ctx, &notes)
 	if err != nil {
 		return []model.Note{}, fmt.Errorf("failed to get notes from collection, error: %w", err)
@@ -100,6 +100,8 @@ func (d *database) GetNotesFiltered(tags []string, category, date string) ([]mod
 }
 
 func getTagsFilter(tags []string) bson.E {
+	// an empty slice is considered a slice with 1 element with the value ""
+	// beause the empty query parameter ?tags= results in that slice when split by ','
 	if len(tags) == 1 && tags[0] == "" {
 		return bson.E{}
 	}
@@ -149,6 +151,20 @@ func (d *database) DeleteNote(noteTitle string) error {
 
 	if err != nil {
 		return fmt.Errorf("failed to delete note '%s' from collection, error: %w", noteTitle, err)
+	}
+
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
+
+func (d *database) DeleteNotes() error {
+	result, err := d.collection.DeleteMany(ctx, bson.D{})
+
+	if err != nil {
+		return fmt.Errorf("failed to delete notes  from collection, error: %w", err)
 	}
 
 	if result.DeletedCount == 0 {

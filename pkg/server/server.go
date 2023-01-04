@@ -78,12 +78,13 @@ func (s server) startMainServers() {
 
 	v1 := defaultRouter.Group("/api/v1")
 	{
-		v1.POST("/notes", s.addNote)
 		v1.GET("/notes", s.getNotes)
+		v1.POST("/notes", s.addNote)
+		v1.DELETE("/notes", s.deleteNotes)
 
 		v1.GET("/notes/:title", s.getNoteByTitle)
-		v1.DELETE("/notes/:title", s.deleteNoteByTitle)
 		v1.POST("/notes/:title", s.updateNoteByTitle)
+		v1.DELETE("/notes/:title", s.deleteNoteByTitle)
 	}
 
 	s.serveHttp(defaultRouter)

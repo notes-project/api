@@ -124,7 +124,7 @@ func (s server) deleteNoteByTitle(c *gin.Context) {
 
 			c.JSON(http.StatusNoContent,
 				gin.H{
-					"error": fmt.Sprintf("note '%s' does not exist", noteTtile),
+					"info": fmt.Sprintf("note '%s' does not exist", noteTtile),
 				},
 			)
 
@@ -136,6 +136,36 @@ func (s server) deleteNoteByTitle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError,
 			gin.H{
 				"error": fmt.Sprintf("failed to retrieve note '%s'", noteTtile),
+			},
+		)
+
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func (s server) deleteNotes(c *gin.Context) {
+
+	err := s.db.DeleteNotes()
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			s.logger.Info("0 notes in database")
+
+			c.JSON(http.StatusNoContent,
+				gin.H{
+					"info": fmt.Sprintf("no notes available"),
+				},
+			)
+
+			return
+		}
+
+		s.logger.Error(fmt.Sprintf("Failed to delete notes from database, err: %s", err))
+
+		c.JSON(http.StatusInternalServerError,
+			gin.H{
+				"error": fmt.Sprintf("failed to delete notes"),
 			},
 		)
 
