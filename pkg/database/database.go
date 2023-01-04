@@ -23,6 +23,7 @@ type Database interface {
 	GetNotes() ([]model.Note, error)
 	GetNotesFiltered(tags []string, category, date string) ([]model.Note, error)
 	DeleteNote(noteTitle string) error
+	DeleteNotes() error
 }
 
 type database struct {
@@ -30,8 +31,8 @@ type database struct {
 	logger *zap.Logger
 
 	// populated automatically inside the Connect() method
-	client     *mongo.Client
-	collection *mongo.Collection
+	client     DbClient
+	collection DbCollection
 }
 
 const (
@@ -40,7 +41,7 @@ const (
 )
 
 var (
-	ctx = context.TODO()
+	ctx = context.Background()
 )
 
 func (d *database) Connect() error {
@@ -60,7 +61,7 @@ func (d *database) Connect() error {
 		return fmt.Errorf("failed to connect to the database, error: %w", err)
 	}
 
-	err = d.client.Ping(context.TODO(), readpref.Primary())
+	err = d.client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		return fmt.Errorf("failed to verify database connection, error: %w", err)
 	}
@@ -95,6 +96,6 @@ func (d *database) setUniqueIndexes() error {
 }
 
 func (d *database) IsReady() bool {
-	err := d.client.Ping(context.TODO(), readpref.Primary())
+	err := d.client.Ping(ctx, readpref.Primary())
 	return err == nil
 }
