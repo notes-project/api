@@ -26,8 +26,8 @@ The tests are written with the [Ginkgo](https://github.com/onsi/ginkgo) and [Gom
 
 - [Golang](https://go.dev)
 - [MongoDB](https://www.mongodb.com) instance
-- [Docker](https://www.docker.com) (optional)
-- [Kubernetes](https://kubernetes.io) (optional)
+- [Docker](https://www.docker.com)
+- [Kubernetes](https://kubernetes.io)
 
 ## Build
 
@@ -57,3 +57,5 @@ When deploying the application to kubernetes, the DB configuration is provided v
 - tls.pem - contains both the API client certificate and the certificate's private key
 
 The additional environment variables and application arguments are provided inside the deployment file `./deployments/2deployment.yaml`
+
+Additionally the port `3040` is hardcoded as the port for the health server for the kubernetes probes.
