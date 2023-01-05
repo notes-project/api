@@ -16,7 +16,6 @@ The tests are written with the [Ginkgo](https://github.com/onsi/ginkgo) and [Gom
 
 ## Contents
 
-- [Overview](#Overview)
 - [Prerequisites](#prerequisites)
 - [Build](#build)
 - [Configure](#configure)
