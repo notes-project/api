@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/denislavPetkov/notes/pkg/adapters"
-	facademongo "github.com/denislavPetkov/notes/pkg/facade/go.mongodb.org/mongo-driver/mongo"
-	"github.com/denislavPetkov/notes/pkg/model"
+	"github.com/notes-project/api/pkg/adapters"
+	facademongo "github.com/notes-project/api/pkg/facade/go.mongodb.org/mongo-driver/mongo"
+	"github.com/notes-project/api/pkg/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

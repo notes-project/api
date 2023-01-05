@@ -1,6 +1,6 @@
 package server
 
-import "github.com/denislavPetkov/notes/pkg/database"
+import "github.com/notes-project/api/pkg/database"
 
 type serverConfiguration struct {
 	port string

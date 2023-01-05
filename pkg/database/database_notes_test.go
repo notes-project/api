@@ -3,9 +3,9 @@ package database
 import (
 	"errors"
 
-	mockadapters "github.com/denislavPetkov/notes/pkg/mock/adapters"
-	"github.com/denislavPetkov/notes/pkg/model"
 	"github.com/golang/mock/gomock"
+	mockadapters "github.com/notes-project/api/pkg/mock/adapters"
+	"github.com/notes-project/api/pkg/model"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/bson"

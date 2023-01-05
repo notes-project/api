@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 
-	"github.com/denislavPetkov/notes/pkg/model"
+	"github.com/notes-project/api/pkg/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

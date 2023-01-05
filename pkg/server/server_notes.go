@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/denislavPetkov/notes/pkg/constants"
-	"github.com/denislavPetkov/notes/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/notes-project/api/pkg/constants"
+	"github.com/notes-project/api/pkg/model"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

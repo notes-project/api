@@ -1,4 +1,4 @@
-module github.com/denislavPetkov/notes
+module github.com/notes-project/api
 
 go 1.19
 

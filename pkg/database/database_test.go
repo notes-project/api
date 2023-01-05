@@ -3,10 +3,10 @@ package database
 import (
 	"errors"
 
-	facademongo "github.com/denislavPetkov/notes/pkg/facade/go.mongodb.org/mongo-driver/mongo"
-	mockadapters "github.com/denislavPetkov/notes/pkg/mock/adapters"
-	mockfacademongo "github.com/denislavPetkov/notes/pkg/mock/facade/go.mongodb.org/mongo-driver/mongo"
 	"github.com/golang/mock/gomock"
+	facademongo "github.com/notes-project/api/pkg/facade/go.mongodb.org/mongo-driver/mongo"
+	mockadapters "github.com/notes-project/api/pkg/mock/adapters"
+	mockfacademongo "github.com/notes-project/api/pkg/mock/facade/go.mongodb.org/mongo-driver/mongo"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/mongo"
