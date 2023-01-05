@@ -154,7 +154,7 @@ func (s server) deleteNotes(c *gin.Context) {
 
 			c.JSON(http.StatusNoContent,
 				gin.H{
-					"info": fmt.Sprintf("no notes available"),
+					"info": "no notes available",
 				},
 			)
 
@@ -165,7 +165,7 @@ func (s server) deleteNotes(c *gin.Context) {
 
 		c.JSON(http.StatusInternalServerError,
 			gin.H{
-				"error": fmt.Sprintf("failed to delete notes"),
+				"error": "failed to delete notes",
 			},
 		)
 
