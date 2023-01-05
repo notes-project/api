@@ -37,6 +37,8 @@ Building a docker image with the Dockerfile can be done with `docker build -f ./
 
 ## Configure
 
+__Port `3040` is hardcoded as the port for the health server for the kubernetes probes.__
+
 There are 5 environment variables you need to set to configure the application:
 
 - **[required]** DATABASE_URI - the connection URI for the database
@@ -57,5 +59,3 @@ When deploying the application to kubernetes, the DB configuration is provided v
 - tls.pem - contains both the API client certificate and the certificate's private key
 
 The additional environment variables and application arguments are provided inside the deployment file `./deployments/2deployment.yaml`
-
-Additionally the port `3040` is hardcoded as the port for the health server for the kubernetes probes.
