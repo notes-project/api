@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 
-	mockdatabase "github.com/denislavPetkov/notes/pkg/mock/database"
+	mockadapters "github.com/denislavPetkov/notes/pkg/mock/adapters"
 	"github.com/denislavPetkov/notes/pkg/model"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -18,8 +18,8 @@ var _ = Describe("DatabaseNotes", func() {
 	var (
 		ctrl *gomock.Controller
 
-		mockDbClient     *mockdatabase.MockDbClient
-		mockDbCollection *mockdatabase.MockDbCollection
+		mockDbClient     *mockadapters.MockDbClient
+		mockDbCollection *mockadapters.MockDbCollection
 
 		dbInstance *database
 	)
@@ -27,8 +27,8 @@ var _ = Describe("DatabaseNotes", func() {
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
 
-		mockDbClient = mockdatabase.NewMockDbClient(ctrl)
-		mockDbCollection = mockdatabase.NewMockDbCollection(ctrl)
+		mockDbClient = mockadapters.NewMockDbClient(ctrl)
+		mockDbCollection = mockadapters.NewMockDbCollection(ctrl)
 
 		dbInstance = &database{
 			databaseConfiguration: databaseConfiguration{

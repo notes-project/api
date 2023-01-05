@@ -11,6 +11,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	mongo "go.mongodb.org/mongo-driver/mongo"
 	options "go.mongodb.org/mongo-driver/mongo/options"
+	readpref "go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 // MockClient is a mock of Client interface.
@@ -54,4 +55,37 @@ func (mr *MockClientMockRecorder) Connect(ctx interface{}, opts ...interface{}) 
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockClient)(nil).Connect), varargs...)
+}
+
+// Database mocks base method.
+func (m *MockClient) Database(client *mongo.Client, name string, opts ...*options.DatabaseOptions) *mongo.Database {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{client, name}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Database", varargs...)
+	ret0, _ := ret[0].(*mongo.Database)
+	return ret0
+}
+
+// Database indicates an expected call of Database.
+func (mr *MockClientMockRecorder) Database(client, name interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{client, name}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Database", reflect.TypeOf((*MockClient)(nil).Database), varargs...)
+}
+
+// Ping mocks base method.
+func (m *MockClient) Ping(client *mongo.Client, ctx context.Context, rp *readpref.ReadPref) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Ping", client, ctx, rp)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Ping indicates an expected call of Ping.
+func (mr *MockClientMockRecorder) Ping(client, ctx, rp interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockClient)(nil).Ping), client, ctx, rp)
 }

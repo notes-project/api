@@ -1,4 +1,4 @@
-package database
+package adapters
 
 import (
 	"context"
@@ -9,9 +9,9 @@ import (
 )
 
 /*
-	Interfaces for the database client and collection structs.
+	Interfaces for the database objects.
 
-	Provides a way to mock the client and collection calls.
+	Provides a way to mock the object calls.
 */
 
 type DbCollection interface {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/denislavPetkov/notes/pkg/adapters"
 	facademongo "github.com/denislavPetkov/notes/pkg/facade/go.mongodb.org/mongo-driver/mongo"
 	"github.com/denislavPetkov/notes/pkg/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,8 +33,8 @@ type database struct {
 	logger *zap.Logger
 
 	// populated automatically inside the Connect() method
-	client     DbClient
-	collection DbCollection
+	client     adapters.DbClient
+	collection adapters.DbCollection
 }
 
 const (
@@ -57,17 +58,19 @@ func (d *database) Connect() error {
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().ApplyURI(d.connectionUri).SetServerAPIOptions(serverAPIOptions)
 
-	d.client, err = facademongo.GetInstace().Connect(ctx, clientOptions)
+	d.client, err = facademongo.GetClientInstace().Connect(ctx, clientOptions)
 	if err != nil {
 		return fmt.Errorf("failed to connect to the database, error: %w", err)
 	}
 
-	err = d.client.Ping(ctx, readpref.Primary())
+	err = facademongo.GetClientInstace().Ping(d.client.(*mongo.Client), ctx, readpref.Primary())
 	if err != nil {
 		return fmt.Errorf("failed to verify database connection, error: %w", err)
 	}
 
-	d.collection = d.client.Database(d.databaseName).Collection(d.collectionName)
+	db := facademongo.GetClientInstace().Database(d.client.(*mongo.Client), d.databaseName)
+
+	d.collection = facademongo.GetDatabaseInstace().Collection(db, d.collectionName)
 
 	err = d.setUniqueIndexes()
 	if err != nil {
@@ -80,7 +83,9 @@ func (d *database) Connect() error {
 }
 
 func (d *database) setUniqueIndexes() error {
-	_, err := d.collection.Indexes().CreateOne(ctx, mongo.IndexModel{
+	indexView := d.collection.Indexes()
+
+	_, err := facademongo.GetIndexViewInstace().CreateOne(indexView, ctx, mongo.IndexModel{
 		// the title filed of the note from model.Note
 		Keys: bson.D{
 			{Key: noteTitlePrimaryKey, Value: -1},
