@@ -6,7 +6,7 @@ Rest API that allows users to:
 - Add(yet to implement), read and delete multiple notes
 - Filter notes by dates, categories, and tags.
 
-A note contains a title, description, category, date, and tags.
+A note contains a title(**required, unique**), description(**required**), category(**optional**), date(**populated by the API**), and tags(**optional**).
 
 ## Overview
 
