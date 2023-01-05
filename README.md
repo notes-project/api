@@ -42,7 +42,7 @@ __Port `3040` is hardcoded as the port for the health server for the kubernetes 
 There are 5 environment variables you need to set to configure the application:
 
 - **[required]** DATABASE_URI - the connection URI for the database
-    - You can enable TSL communication to the database if you pass the parameters to the connection URI(**tlsCertificateKeyFile** which points to the file where the certificate and its private key is)
+    - You can enable TSL communication to the database if you pass the parameters to the connection URI. For example `mongodb+srv://CLUSTER_LOCATION/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority&tlsCertificateKeyFile=./certs/tls.pem`, where **tlsCertificateKeyFile** points to the file where the certificate and its private key are
 - **[required]** DATABASE_NAME - the name of the database
 - **[required]** DATABASE_COLLECTION - the name of the database collection that will be used
 - **[required]** SERVER_PORT - the server port for the HTTP traffic
