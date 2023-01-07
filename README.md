@@ -87,3 +87,11 @@ TODO
 - DELETE
     - /api/v1/notes - delete all the notes.
     - /api/v1/notes/:title - delete the note that matches the provided title.
+
+
+### Health server
+
+Endpoints for the kubernetes readiness & liveness probes
+
+- /readyz - returns HTTP 200 when the server is ready to receive traffic or HTTP 500 when it is not.
+- /healthz - returns HTTP 200 when the server is alive and running.
