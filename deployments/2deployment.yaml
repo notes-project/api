@@ -36,7 +36,7 @@ spec:
             path: /healthz
             port: health-port
           initialDelaySeconds: 10
-          periodSeconds: 15
+          periodSeconds: 5
           timeoutSeconds: 5 
         ports:
           - name: health-port
