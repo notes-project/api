@@ -6,7 +6,7 @@ COPY vendor/ vendor/
 COPY go.* .
 COPY main.go main.go
 
-# RUN go test
+RUN go test ./pkg/...
 
 RUN CGO_ENABLED=0 go build -o /go/bin/app
 

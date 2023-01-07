@@ -3,22 +3,25 @@ kind: Deployment
 metadata:
   labels:
     app: notes
+    component: api
   name: notes
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: notes
+      component: api
   template:
     metadata:
       labels:
         app: notes
+        component: api
     spec:
       containers:
       - image: notes:test
         name: notes
         args:
-        # need for TLS communication
+        # needed for TLS communication
           - "--tlsCertLocation=./certs/tls.crt"
           - "--tlsKeyLocation=./certs/tls.key"
         readinessProbe:
@@ -40,13 +43,13 @@ spec:
             containerPort: 3040
           - name: http-port
             containerPort: 9000
-            # need for TLS communication
+            # needed for TLS communication
           - name: https-port
             containerPort: 9001
         env:
           - name: SERVER_PORT
             value: "9000"
-          # need for TLS communication
+          # needed for TLS communication
           - name: SERVER_TLS_PORT
             value: "9001"
         envFrom:
@@ -61,12 +64,12 @@ spec:
             cpu: 100m
             memory: 250Mi
             ephemeral-storage: 100Mi
-        # need for TLS communication
+        # needed for TLS communication
         volumeMounts:
           - name: certs
             mountPath: "./certs"
             readOnly: true
-      # need for TLS communication
+      # needed for TLS communication
       volumes:
         - name: certs
           secret:

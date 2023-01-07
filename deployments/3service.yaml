@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     app: notes
+    component: api
   name: notes
 spec:
   ports:

@@ -3,6 +3,7 @@ kind: Secret
 metadata:
   labels:
     app: notes
+    component: api
   name: notes-db-configuration
 data: 
   DATABASE_URI: <db uri>
