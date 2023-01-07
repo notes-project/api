@@ -14,13 +14,15 @@ The API is written in [Golang](https://go.dev) and it is using the [Gin Web Fram
 
 The tests are written with the [Ginkgo](https://github.com/onsi/ginkgo) and [Gomega](https://github.com/onsi/gomega) testing frameworks. For mocks the [Gomock](https://github.com/golang/mock) mocking framework is used.
 
+The API works with JSON.
+
 ## Contents
 
 - [Prerequisites](#prerequisites)
 - [Build](#build)
 - [Configure](#configure)
 - [Deploy](#deploy)
-- [Run](#run)
+- [API Endpoints](#api-endpoints)
 
 ## Prerequisites
 
@@ -59,3 +61,29 @@ When deploying the application to kubernetes, the DB configuration is provided v
 - tls.pem - contains both the API client certificate and the certificate's private key
 
 The additional environment variables and application arguments are provided inside the deployment file `./deployments/2deployment.yaml`
+
+## Deploy
+
+TODO
+
+## API Endpoints
+
+- GET
+    - /api/v1/notes - get the notes objects, supports query parameters for the tags, category and date.
+
+    Example: `api/v1/notes?tags=test,new` returns all notes that contain the tags `test` and `new`.
+    
+    The date when provided must be in the format `"02-Jan-2006"`.
+
+    - /api/v1/notes/:title - get the note that matches the provided title.
+
+    Example: `/api/v1/notes/test` returns the note with title `test`.
+
+- POST
+    - /api/v1/notes - create a new note object. The title and description are required while the date is populated by the API in the format of `"02-Jan-2006"`.
+
+    - api/v1/notes/:title - updates the note that matches the provided title.
+
+- DELETE
+    - /api/v1/notes - delete all the notes.
+    - /api/v1/notes/:title - delete the note that matches the provided title.
