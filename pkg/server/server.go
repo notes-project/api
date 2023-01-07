@@ -93,8 +93,10 @@ func (s server) startMainServers() {
 
 func (s server) serveHttp(router *gin.Engine) {
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%s", s.port),
-		Handler: router,
+		Addr:         fmt.Sprintf(":%s", s.port),
+		Handler:      router,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	*s.servers = append(*s.servers, httpServer)
@@ -112,8 +114,10 @@ func (s server) serveHttp(router *gin.Engine) {
 
 func (s server) serveHttps(router *gin.Engine) {
 	httpsServer := &http.Server{
-		Addr:    fmt.Sprintf(":%s", s.tlsPort),
-		Handler: router,
+		Addr:         fmt.Sprintf(":%s", s.tlsPort),
+		Handler:      router,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	if len(s.tlsPort) > 0 && s.tlsCertLocation != "" && s.tlsKeyLocation != "" {

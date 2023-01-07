@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,8 +25,10 @@ func (s server) serveHealthProbes() {
 	router.GET(livenessEndpoint, s.isAlive)
 
 	healthServer := &http.Server{
-		Addr:    fmt.Sprintf(":%s", healthPort),
-		Handler: router,
+		Addr:         fmt.Sprintf(":%s", healthPort),
+		Handler:      router,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	*s.servers = append(*s.servers, healthServer)
