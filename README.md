@@ -93,5 +93,5 @@ TODO
 
 Endpoints for the kubernetes readiness & liveness probes
 
-- /readyz - returns HTTP 200 when the server is ready to receive traffic or HTTP 500 when it is not.
-- /healthz - returns HTTP 200 when the server is alive and running.
+- /readyz - returns `HTTP 200` when the server is ready to receive traffic or `HTTP 500` when it is not.
+- /healthz - returns `HTTP 200` when the server is alive and running.
